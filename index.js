@@ -109,6 +109,8 @@ bot.on("callback_query", async (msg) => {
     fs.rmdirSync(`temp`, { recursive: true });
     fs.unlinkSync(`${__dirname}/${text1}.pdf`);
     fs.mkdirSync(`${__dirname}/temp`);
+
+    pages = [];
   } else msg.telegram.sendMessage(about.id, "PDF yaratilmadi");
 });
 bot.launch();
