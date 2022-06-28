@@ -4,11 +4,11 @@ const { Telegraf } = require("telegraf");
 const axios = require("axios").default;
 const imgToPDF = require("image-to-pdf");
 const fs = require("fs");
-const name = {};
+let name = {};
 const bot = new Telegraf(process.env.TOKEN);
 
 let son = 0;
-const pages = [];
+let pages = [];
 bot.command("/start", async (msg) => {
   const about = msg.update.message.from;
   msg.telegram.sendMessage(
@@ -109,7 +109,6 @@ bot.on("callback_query", async (msg) => {
     fs.rmdirSync(`temp`, { recursive: true });
     fs.unlinkSync(`${__dirname}/${text1}.pdf`);
     fs.mkdirSync(`${__dirname}/temp`);
-    //azizjon
     pages = [];
   } else msg.telegram.sendMessage(about.id, "PDF yaratilmadi");
 });
