@@ -4,7 +4,7 @@ const { Telegraf } = require("telegraf");
 const axios = require("axios").default;
 const imgToPDF = require("image-to-pdf");
 const fs = require("fs");
-
+const name = {};
 const bot = new Telegraf(process.env.TOKEN);
 
 let son = 0;
@@ -49,8 +49,21 @@ bot.on("text", async (msg) => {
   }
   if (son == 1) {
     imgToPDF(pages, "A4").pipe(fs.createWriteStream(`./${text}.pdf`));
-
-    msg.telegram.sendMessage(about.id, "PDF yaratildi 10 soniya kutib turing ");
+    name.name = text;
+    msg.telegram.sendMessage(
+      about.id,
+      "PDF yaratildi 10 soniya kutib turing PDF ni olaszmi",
+      {
+        reply_markup: {
+          remove_keyboard: true,
+          resize_keyboard: true,
+          inline_keyboard: [
+            [{ text: "ha", callback_data: "ha" }],
+            [{ text: "Yo'q", callback_data: "yuq" }],
+          ],
+        },
+      }
+    );
 
     // fs.readFile(`${__dirname}/salom.pdf`, {}, function (err, data) {
     //   if (!err) {
@@ -62,18 +75,6 @@ bot.on("text", async (msg) => {
     //   } else {
     //     console.log(err);
     //   }
-    setTimeout(() => {
-      const data = fs.readFileSync(`${__dirname}/${text}.pdf`);
-
-      msg.telegram.sendDocument(about.id, {
-        source: data,
-        filename: `${text}.pdf`,
-      });
-      son = 0;
-      fs.rmdirSync(`temp`, { recursive: true });
-      fs.unlinkSync(`${__dirname}/${text}.pdf`);
-      fs.mkdirSync(`${__dirname}/temp`);
-    }, 10000);
   }
 });
 
@@ -92,5 +93,22 @@ bot.on("photo", async (msg) => {
   await data.data.pipe(fs.createWriteStream(`${__dirname}/temp/${photo}.jpg`));
   msg.telegram.sendMessage(about.id, "IShlayapti");
   son = 1;
+});
+bot.on("callback_query", async (msg) => {
+  const text = msg.update.callback_query.data;
+  const about = msg.update.callback_query.from;
+  const text1 = name.name;
+  if (text == "ha") {
+    const data = fs.readFileSync(`${__dirname}/${text1}.pdf`);
+
+    await msg.telegram.sendDocument(about.id, {
+      source: data,
+      filename: `${text1}.pdf`,
+    });
+    son = 0;
+    fs.rmdirSync(`temp`, { recursive: true });
+    fs.unlinkSync(`${__dirname}/${text1}.pdf`);
+    fs.mkdirSync(`${__dirname}/temp`);
+  } else msg.telegram.sendMessage(about.id, "PDF yaratilmadi");
 });
 bot.launch();
